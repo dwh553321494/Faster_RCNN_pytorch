@@ -52,6 +52,9 @@ if __name__ == "__main__":
     box_heights = anchors_all[:,3]-anchors_all[:,1]
     
     for i in [108, 109, 110, 111, 112, 113, 114, 115, 116]:
-        rect = plt.Rectangle([anchors_all[i, 0],anchors_all[i, 1]],box_widths[i],box_heights[i],color="r",fill=False)
+        rect = plt.Rectangle([anchors_all[
+            i, 0],anchors_all[i, 1]],box_widths[i],box_heights[i],color="r",fill=False)
         ax.add_patch(rect)
     plt.show()
+    
+    

@@ -54,14 +54,14 @@ class FasterRCNN(nn.Module):
     def forward(self, x, scale=1., mode="forward"):
         if mode == "forward":
             #   计算输入图片的大小
-            img_size        = x.shape[2:]
+            img_size = x.shape[2:]
             #   利用主干网络提取特征
-            base_feature    = self.extractor.forward(x)
+            base_feature = self.extractor.forward(x)
 
             #   获得建议框
             _, _, rois, roi_indices, _  = self.rpn.forward(base_feature, img_size, scale)
             #   获得classifier的分类结果和回归结果
-            roi_cls_locs, roi_scores    = self.head.forward(base_feature, rois, roi_indices, img_size)
+            roi_cls_locs, roi_scores = self.head.forward(base_feature, rois, roi_indices, img_size)
             return roi_cls_locs, roi_scores, rois, roi_indices
         elif mode == "extractor":
             #   利用主干网络提取特征
