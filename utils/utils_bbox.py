@@ -5,7 +5,7 @@ from torchvision.ops import nms
 
 
 def loc2bbox(src_bbox, loc):
-    if src_bbox.size()[0] == 0:
+    if src_bbox.size()[0] == 0:     
         return torch.zeros((0, 4), dtype=loc.dtype)
 
     src_width   = torch.unsqueeze(src_bbox[:, 2] - src_bbox[:, 0], -1)

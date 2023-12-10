@@ -3,6 +3,7 @@
 #-------------------------------------#
 import datetime
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 from functools import partial
 
 import numpy as np
@@ -19,6 +20,8 @@ from utils.dataloader import FRCNNDataset, frcnn_dataset_collate
 from utils.utils import (get_classes, seed_everything, show_config,
                          worker_init_fn)
 from utils.utils_fit import fit_one_epoch
+
+from tensorboardX import SummaryWriter
 
 '''
 训练自己的目标检测模型一定需要注意以下几点：
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     #------------------------------------------------------#
     #   input_shape     输入的shape大小
     #------------------------------------------------------#
-    input_shape     = [600, 600]
+    input_shape     = [512, 512]
     #---------------------------------------------#
     #   vgg
     #   resnet50
@@ -151,7 +154,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------------#
     Init_Epoch          = 0
     Freeze_Epoch        = 50
-    Freeze_batch_size   = 4
+    Freeze_batch_size   = 6
     #------------------------------------------------------------------#
     #   解冻阶段训练参数
     #   此时模型的主干不被冻结了，特征提取网络会发生改变
@@ -161,8 +164,8 @@ if __name__ == "__main__":
     #                           Adam可以使用相对较小的UnFreeze_Epoch
     #   Unfreeze_batch_size     模型在解冻后的batch_size
     #------------------------------------------------------------------#
-    UnFreeze_Epoch      = 100
-    Unfreeze_batch_size = 2
+    UnFreeze_Epoch      = 20
+    Unfreeze_batch_size = 4
     #------------------------------------------------------------------#
     #   Freeze_Train    是否进行冻结训练
     #                   默认先冻结主干训练后解冻训练。
@@ -204,6 +207,7 @@ if __name__ == "__main__":
     #   save_dir        权值与日志文件保存的文件夹
     #------------------------------------------------------------------#
     save_dir            = 'logs'
+    summary_writer      = SummaryWriter(logdir = 'log/12_8_faster_rcnn')
     #------------------------------------------------------------------#
     #   eval_flag       是否在训练时进行评估，评估对象为验证集
     #                   安装pycocotools库后，评估体验更佳。
@@ -300,6 +304,7 @@ if __name__ == "__main__":
     with open(train_annotation_path, encoding='utf-8') as f:
         train_lines = f.readlines()
     with open(val_annotation_path, encoding='utf-8') as f:
+        
         val_lines   = f.readlines()
     num_train   = len(train_lines)
     num_val     = len(val_lines)
@@ -448,6 +453,6 @@ if __name__ == "__main__":
                 
             set_optimizer_lr(optimizer, lr_scheduler_func, epoch)
             
-            fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, UnFreeze_Epoch, Cuda, fp16, scaler, save_period, save_dir)
+            fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, UnFreeze_Epoch, Cuda, fp16, scaler, save_period, save_dir, summary_writer)
             
         loss_history.writer.close()

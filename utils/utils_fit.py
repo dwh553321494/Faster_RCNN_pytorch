@@ -6,7 +6,7 @@ from tqdm import tqdm
 from utils.utils import get_lr
 
 
-def fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, Epoch, cuda, fp16, scaler, save_period, save_dir):
+def fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, Epoch, cuda, fp16, scaler, save_period, save_dir, summary_writer):
     total_loss = 0
     rpn_loc_loss = 0
     rpn_cls_loss = 0
@@ -37,6 +37,12 @@ def fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epo
                                 'roi_loc'       : roi_loc_loss / (iteration + 1), 
                                 'roi_cls'       : roi_cls_loss / (iteration + 1), 
                                 'lr'            : get_lr(optimizer)})
+            summary_writer.add_scalar('train/total_loss', total_loss / (iteration + 1), epoch * epoch_step + iteration)
+            summary_writer.add_scalar('train/rpn_loc', rpn_loc_loss / (iteration + 1), epoch * epoch_step + iteration)
+            summary_writer.add_scalar('train/rpn_cls', rpn_cls_loss / (iteration + 1), epoch * epoch_step + iteration)
+            summary_writer.add_scalar('train/roi_loc', roi_loc_loss / (iteration + 1), epoch * epoch_step + iteration)
+            summary_writer.add_scalar('train/roi_cls', roi_cls_loss / (iteration + 1), epoch * epoch_step + iteration)
+            summary_writer.add_scalar('train/lr', get_lr(optimizer), epoch * epoch_step + iteration)
             pbar.update(1)
 
     print('Finish Train')
@@ -56,6 +62,7 @@ def fit_one_epoch(model, train_util, loss_history, eval_callback, optimizer, epo
                 
                 pbar.set_postfix(**{'val_loss'  : val_loss / (iteration + 1)})
                 pbar.update(1)
+                summary_writer.add_scalar('val/total_loss', val_loss / (iteration + 1), epoch * epoch_step_val + iteration)
 
     print('Finish Validation')
     loss_history.append_loss(epoch + 1, total_loss / epoch_step, val_loss / epoch_step_val)

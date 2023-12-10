@@ -1,7 +1,3 @@
-#----------------------------------------------------#
-#   将单张图片预测、摄像头检测和FPS测试功能
-#   整合到了一个py文件中，通过指定mode进行模式的修改。
-#----------------------------------------------------#
 import time
 
 import cv2
@@ -19,7 +15,7 @@ if __name__ == "__main__":
     #   'fps'               表示测试fps，使用的图片是img里面的street.jpg，详情查看下方注释。
     #   'dir_predict'       表示遍历文件夹进行检测并保存。默认遍历img文件夹，保存img_out文件夹，详情查看下方注释。
     #----------------------------------------------------------------------------------------------------------#
-    mode = "predict"
+    mode = "dir_predict" 
     #-------------------------------------------------------------------------#
     #   crop                指定了是否在单张图片预测后对目标进行截取
     #   count               指定了是否进行目标的计数
@@ -133,7 +129,7 @@ if __name__ == "__main__":
                 r_image     = frcnn.detect_image(image)
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
-                r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
+                r_image.save(os.path.join(dir_save_path, img_name.replace(".tif", ".png")), quality=95, subsampling=0)
 
     else:
         raise AssertionError("Please specify the correct mode: 'predict', 'video', 'fps' or 'dir_predict'.")
